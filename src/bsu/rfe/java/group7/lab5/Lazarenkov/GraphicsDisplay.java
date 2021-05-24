@@ -355,3 +355,50 @@ public class GraphicsDisplay extends JPanel {
             }
         }
     }
+    public class MouseMotionHandler implements MouseMotionListener {
+        public MouseMotionHandler() {
+        }
+
+        public void mouseMoved(MouseEvent ev) {
+            GraphicsDisplay.this.selectedMarker = GraphicsDisplay.this.findSelectedPoint(ev.getX(), ev.getY());
+            if (GraphicsDisplay.this.selectedMarker >= 0) {
+                GraphicsDisplay.this.setCursor(Cursor.getPredefinedCursor(8));
+            } else {
+                GraphicsDisplay.this.setCursor(Cursor.getPredefinedCursor(0));
+            }
+
+            GraphicsDisplay.this.repaint();
+        }
+
+        public void mouseDragged(MouseEvent ev) {
+            if (GraphicsDisplay.this.changeMode) {
+                double[] currentPoint = GraphicsDisplay.this.translatePointToXY(ev.getX(), ev.getY());
+                double newY = ((Double[])GraphicsDisplay.this.graphicsData.get(GraphicsDisplay.this.selectedMarker))[1] + (currentPoint[1] - ((Double[])GraphicsDisplay.this.graphicsData.get(GraphicsDisplay.this.selectedMarker))[1]);
+                if (newY > GraphicsDisplay.this.viewport[0][1]) {
+                    newY = GraphicsDisplay.this.viewport[0][1];
+                }
+
+                if (newY < GraphicsDisplay.this.viewport[1][1]) {
+                    newY = GraphicsDisplay.this.viewport[1][1];
+                }
+
+                ((Double[])GraphicsDisplay.this.graphicsData.get(GraphicsDisplay.this.selectedMarker))[1] = newY;
+                GraphicsDisplay.this.repaint();
+            } else {
+                double width = (double)ev.getX() - GraphicsDisplay.this.selectionRect.getX();
+                if (width < 5.0D) {
+                    width = 5.0D;
+                }
+
+                double height = (double)ev.getY() - GraphicsDisplay.this.selectionRect.getY();
+                if (height < 5.0D) {
+                    height = 5.0D;
+                }
+
+                GraphicsDisplay.this.selectionRect.setFrame(GraphicsDisplay.this.selectionRect.getX(), GraphicsDisplay.this.selectionRect.getY(), width, height);
+                GraphicsDisplay.this.repaint();
+            }
+
+        }
+    }
+}
